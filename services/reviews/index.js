@@ -1,5 +1,7 @@
-const { ApolloServer, gql } = require("apollo-server");
+const { gql } = require("apollo-server");
+const { ApolloServer } = require("apollo-server-express");
 const { buildFederatedSchema } = require("@apollo/federation");
+const express = require("express");
 
 const typeDefs = gql`
   type Review @key(fields: "id") {
@@ -29,6 +31,7 @@ const resolvers = {
   },
   User: {
     reviews(user) {
+      console.log("User review ooking for ", user.id);
       return reviews.filter(review => review.authorID === user.id);
     },
     numberOfReviews(user) {
@@ -41,6 +44,7 @@ const resolvers = {
   },
   Product: {
     reviews(product) {
+      console.log("Product review looking for", product.upc);
       return reviews.filter(review => review.product.upc === product.upc);
     }
   }
@@ -55,8 +59,18 @@ const server = new ApolloServer({
   ])
 });
 
-server.listen({ port: 4002 }).then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
+const serviceName = __dirname.split("/").pop();
+const app = express();
+app.use(express.json());
+let ctr = 0;
+app.use((req, res, next) => {
+  console.log(`${serviceName} request count: ${++ctr}`);
+  next();
+});
+
+server.applyMiddleware({ app });
+app.listen({ port: 4002, path: "/" }, function() {
+  console.log(`🚀  [${serviceName}] Server ready at ::${this.address().port}`);
 });
 
 const usernames = [
