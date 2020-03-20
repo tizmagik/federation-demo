@@ -2,11 +2,12 @@
   "name": "federation-demo",
   "main": "gateway.js",
   "scripts": {
-    "start-gateway": "nodemon gateway.js",
-    "start-service-accounts": "nodemon services/accounts/index.js",
-    "start-service-reviews": "nodemon services/reviews/index.js",
-    "start-service-products": "nodemon services/products/index.js",
-    "start-service-inventory": "nodemon services/inventory/index.js",
+    "start-gateway": "nodemon --delay 4s gateway.js",
+    "start-service-accounts": "nodemon --delay 400ms services/accounts/index.js",
+    "start-service-reviews": "nodemon --delay 400ms services/reviews/index.js",
+    "start-service-products": "nodemon --delay 400ms services/products/index.js",
+    "start-service-inventory": "nodemon --delay 400ms services/inventory/index.js",
+    "start-service-transformed": "nodemon --delay 400ms services/transformed/index.js",
     "start-services": "concurrently \"npm:start-service-*\"",
     "postinstall": "lerna bootstrap"
   },
