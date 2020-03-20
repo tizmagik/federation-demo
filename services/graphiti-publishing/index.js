@@ -4,12 +4,47 @@ const { buildFederatedSchema } = require("@apollo/federation");
 const typeDefs = gql`
   extend type Query {
     me: User
+    feed(id: String!): Feed
   }
 
   type User @key(fields: "id") {
     id: ID!
-    name: String
-    username: String
+    email: String
+  }
+
+  # curator schema approx.
+  enum Layout {
+    AGNOSTIC
+    STACKED
+    CAROUSEL
+  }
+
+  type FeedPackages {
+    uri: String!
+    layout: Layout
+  }
+
+  type FeedExpression {
+    uri: String!
+    packages: [FeedPackages]
+  }
+
+  type Feed {
+    uri: String!
+    name: String # human-readable name for example
+    Expressions: [FeedExpression]
+  }
+
+  # simplifying publishingproperties as just uri for now
+  type CreativeWorkHeadline {
+    subHeadline: String!
+    seo: String!
+    default: String!
+  }
+
+  type Article {
+    headline: CreativeWorkHeadline
+    uri: String!
   }
 `;
 
@@ -35,8 +70,8 @@ const server = new ApolloServer({
   ])
 });
 
-server.listen({ port: 4001 }).then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
+server.listen({ port: 4002 }).then(({ url }) => {
+  console.log(`🚀 graphiti-publishing (samizdat) ready at ${url}`);
 });
 
 const users = [

@@ -2,12 +2,32 @@ const { ApolloServer, gql } = require("apollo-server");
 const { buildFederatedSchema } = require("@apollo/federation");
 
 const typeDefs = gql`
-  extend type Product @key(fields: "upc") {
-    upc: String! @external
-    weight: Int @external
-    price: Int @external
+  extend type User {
+    id: ID! @external
+    
+    ABRA(
+      integration: String!, 
+      tests: [String], 
+      overrides: [String]
+    ): ABRA
+  }
+
+  type ABRAVariant {
+    name: String, # e.g. 'test1'
+    variant: String, # e.g. 'variant1'
+    data: String,
+  }
+
+  type ABRA {
+    ABRAVariants: [ABRAVariant] # can be whatever, even JSON.stringified response
+  }
+
+  type Product @key(fields: "upc") {
+    upc: String! 
+    weight: Int 
+    price: Int 
     inStock: Boolean
-    shippingEstimate: Int @requires(fields: "price weight")
+    shippingEstimate: Int # @requires(fields: "price weight")
   }
 `;
 
@@ -37,8 +57,8 @@ const server = new ApolloServer({
   ])
 });
 
-server.listen({ port: 4004 }).then(({ url }) => {
-  console.log(`🚀 Server ready at ${url}`);
+server.listen({ port: 4001 }).then(({ url }) => {
+  console.log(`🚀 graphiti-general (programmer) ready at ${url}`);
 });
 
 const inventory = [
