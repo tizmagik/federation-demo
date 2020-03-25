@@ -1,15 +1,24 @@
 const { ApolloServer, gql } = require("apollo-server");
 const { buildFederatedSchema } = require("@apollo/federation");
+const {
+  FEED_DATA,
+  FEEDEXPRESSIONS_DATA,
+  USER_DATA,
+  ABRA_DATA
+} = require("../../data");
 
 const typeDefs = gql`
-  extend type Query {
-    me: User
-    feed(id: String!): Feed
+  type Query {
+    user(id: String!): User
+
+    # new types
+    feed(uri: String!): Feed
   }
 
   type User @key(fields: "id") {
     id: ID!
     email: String
+    subscriptionStatus: String # not a real field, but just to get an idea
   }
 
   # curator schema approx.
@@ -19,20 +28,24 @@ const typeDefs = gql`
     CAROUSEL
   }
 
-  type FeedPackages {
+  # these can vary by A/B testing parameters
+  type FeedPackage {
     uri: String!
     layout: Layout
+    articles: [Article]
   }
 
+  # these can vary by user properties
+  # (geoData + desktopOrMobile + regiData)
   type FeedExpression {
     uri: String!
-    packages: [FeedPackages]
+    packages: [FeedPackage]
   }
 
-  type Feed {
+  type Feed @key(fields: "uri") {
     uri: String!
     name: String # human-readable name for example
-    Expressions: [FeedExpression]
+    expressions: [FeedExpression]
   }
 
   # simplifying publishingproperties as just uri for now
@@ -42,23 +55,41 @@ const typeDefs = gql`
     default: String!
   }
 
-  type Article {
+  type Article @key(fields: "uri") {
     headline: CreativeWorkHeadline
     uri: String!
+    # ...
   }
 `;
 
 const resolvers = {
   Query: {
-    me() {
-      return users[0];
+    user(id) {
+      return USER_DATA[0];
     }
+    // feed(uri) {
+    //   // console.log(uri);
+    //   return FEED_DATA[0];
+    // }
   },
-  User: {
+  Feed: {
     __resolveReference(object) {
-      return users.find(user => user.id === object.id);
+      console.log("Feed resolveRef", object);
+    },
+    expressions(object) {
+      console.log("Feed.expressions", object);
+      return FEEDEXPRESSIONS_DATA;
     }
   }
+  // User: {
+  //   __resolveReference(object) {
+  //     return users.find(user => user.id === object.id);
+  //   }
+  // },
+  // Feed: {
+  //   __resolveReference(object) {
+  //   }
+  // }
 };
 
 const server = new ApolloServer({
@@ -73,18 +104,3 @@ const server = new ApolloServer({
 server.listen({ port: 4002 }).then(({ url }) => {
   console.log(`🚀 graphiti-publishing (samizdat) ready at ${url}`);
 });
-
-const users = [
-  {
-    id: "1",
-    name: "Ada Lovelace",
-    birthDate: "1815-12-10",
-    username: "@ada"
-  },
-  {
-    id: "2",
-    name: "Alan Turing",
-    birthDate: "1912-06-23",
-    username: "@complete"
-  }
-];
