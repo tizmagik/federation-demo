@@ -15,7 +15,7 @@ npm start
 
 This will start up the dependent services and make the Gateway available at http://localhost:4000
 
-## Sample Query
+#### Sample Query
 
 ```graphql
 query O2PersonalizedFeed {
