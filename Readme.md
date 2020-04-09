@@ -14,3 +14,38 @@ npm start
 ```
 
 This will start up the dependent services and make the Gateway available at http://localhost:4000
+
+## Sample Query
+
+```graphql
+query O2PersonalizedFeed {
+  user(id: "hi") {
+    email
+    PersonalizedFeed(uri: "nyt://feed/1") {
+      uri
+      name
+      expressions {
+        uri
+        packages {
+          uri
+          layout
+          articles {
+            uri
+            headline {
+              default
+            }
+          }
+        }
+      }
+    }
+    # subscriptionStatus
+    ABRA(integration: "integration1") {
+      ABRAVariants {
+        name
+        variant
+        data
+      }
+    }
+  }
+}
+```
