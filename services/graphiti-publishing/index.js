@@ -4,7 +4,6 @@ const {
   FEED_DATA,
   FEEDEXPRESSIONS_DATA,
   USER_DATA,
-  ABRA_DATA
 } = require("../../data");
 
 const typeDefs = gql`
@@ -66,30 +65,16 @@ const resolvers = {
   Query: {
     user(id) {
       return USER_DATA[0];
+    },
+    feed(obj, arg) {
+      return FEED_DATA.find(f => f.uri === arg.uri)
     }
-    // feed(uri) {
-    //   // console.log(uri);
-    //   return FEED_DATA[0];
-    // }
   },
   Feed: {
-    __resolveReference(object) {
-      console.log("Feed resolveRef", object);
-    },
-    expressions(object) {
-      console.log("Feed.expressions", object);
+    expressions(object, args) {
       return FEEDEXPRESSIONS_DATA;
     }
   }
-  // User: {
-  //   __resolveReference(object) {
-  //     return users.find(user => user.id === object.id);
-  //   }
-  // },
-  // Feed: {
-  //   __resolveReference(object) {
-  //   }
-  // }
 };
 
 const server = new ApolloServer({

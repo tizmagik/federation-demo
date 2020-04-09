@@ -6,7 +6,7 @@
     "start-graphiti-publishing": "nodemon --delay 200ms services/graphiti-publishing/index.js",
     "start-graphiti-general": "nodemon --delay 200ms services/graphiti-general/index.js",
     "start-services": "concurrently \"npm:start-graphiti-*\"",
-    "all": "concurrently \"npm:start-g*\"",
+    "start": "concurrently \"npm:start-g*\"",
     "postinstall": "lerna bootstrap"
   },
   "devDependencies": {
